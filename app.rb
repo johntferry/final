@@ -45,7 +45,7 @@ get "/location/:id" do
     pp @location
     @users_table = users_table
 
-    results = Geocoder.search(@location[:title])
+    results = Geocoder.search(@location[:location])
     lat_long = results.first.coordinates # => [lat, long]
     @coordinates = lat_long[0], lat_long[1]
 

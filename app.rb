@@ -71,7 +71,7 @@ end
 post "/location/:id/suggestions/create" do
     puts "params: #{params}"
 
-    # first find the location that you are leaving a comment on
+    # first find the location that you are leaving a suggestion for
     @location = vacations_table.where(id: params[:id]).to_a[0]
 
     # next we want to insert a row in the suggestions table with the suggestions form data

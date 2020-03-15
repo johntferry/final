@@ -20,19 +20,16 @@
             <a href="/" class="btn btn-primary">Back</a>
         </p>
     </div>
-    <div class="col-sm-6">
+<div class="col-sm-6">
     <h2><%= @location[:title] %> suggestions:</h2>
-    <p>Total suggestions: <%= @suggestions_count %></p>
-                <b><%= suggestions[:summary] %></b></p>
-                    <p><%= suggestions[:comments] %></p>
-                    <p>Name: <%= suggestion[:name] %></p>
+        <b><%= suggestion[:comments] %></b></p>
+        <p>Name: <%= suggestion[:name] %></p>
         <% end %>
-        <p class="mt-5">
+            <p class="mt-5">
             <% if @current_user %>
-                <a href="/location/<%= @location[:id] %>/suggestions/new" class="btn btn-primary">Leave a suggestion!</a>
+                <a href="/location/<%= @location[:id] %>/suggestions/new" class="btn btn-primary">Make a suggestion!</a>
             <% else %>
-                <a href="/logins/new" class="btn btn-danger">Please sign in to provide a suggestion</a>
+                <a href="/logins/new" class="btn btn-danger">Please sign in to comment</a>
             <% end %>
         </p>
-    </div>
 </div>

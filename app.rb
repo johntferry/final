@@ -80,7 +80,6 @@ post "/location/:id/suggestions/create" do
         user_id: session["user_id"],
         comments: params["comments"],
         name: @current_user[:name],
-        year: @current_user[:year],
         email: @current_user[:email]
     )
 
@@ -106,7 +105,6 @@ post "/users/create" do
         users_table.insert(
             name: params["name"],
             email: params["email"],
-            year: params["year"],
             password: BCrypt::Password.create(params["password"])
         )
 

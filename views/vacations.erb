@@ -1,0 +1,7 @@
+<h1>Need vacation ideas?</h1>
+
+<h3>Get the best suggestions for your planned</h3>
+
+<% for location in @vacations %>
+    <p><a href="/location/<%= location[:id] %>"><%= location[:title] %></a></p>
+<% end %>

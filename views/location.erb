@@ -1,0 +1,38 @@
+<div class="row">
+    <div class="col-sm-6">
+        <h1>
+            <i class="fas fa-map-marker-alt"></i>
+            <%= @location[:title] %>
+        </h1>
+        <p><b><%= @location[:description] %></b></p>
+        <p>Date: <%= @location[:date] %></p>
+        <p>Location: <%= @location[:location] %></p>
+
+        <iframe
+                width="380"
+                height="500"
+                frameborder="0" style="border:0"
+                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCtovsQvkIUWlNqtYwXY87gEd4ZSmJEhMw
+                &q=<%= @latitude %>,<%= @longitude %> &zoom=5" allowfullscreen>
+        </iframe>
+        
+        <p>
+            <a href="/" class="btn btn-primary">Back</a>
+        </p>
+    </div>
+    <div class="col-sm-6">
+    <h2><%= @location[:title] %> reviews:</h2>
+    <p>Total suggestions: <%= @suggestions_count %></p>
+                <b><%= suggestion[:summary] %></b></p>
+                    <p><%= suggestion[:comments] %></p>
+                    <p>Name: <%= review[:name] %></p>
+        <% end %>
+        <p class="mt-5">
+            <% if @current_user %>
+                <a href="/location/<%= @location[:id] %>/reviews/new" class="btn btn-primary">Leave a suggestion!</a>
+            <% else %>
+                <a href="/logins/new" class="btn btn-danger">Please sign in to provide a suggestion</a>
+            <% end %>
+        </p>
+    </div>
+</div>

@@ -4,7 +4,8 @@ require "sinatra/reloader" if development?                                      
 require "sequel"                                                                      #
 require "logger"                                                                      #
 require "twilio-ruby"                                                                 #
-require "bcrypt"                                                                      #
+require "bcrypt"
+require "geocoder"                                                                      #
 connection_string = ENV['DATABASE_URL'] || "sqlite://#{Dir.pwd}/development.sqlite3"  #
 DB ||= Sequel.connect(connection_string)                                              #
 DB.loggers << Logger.new($stdout) unless DB.loggers.size > 0                          #
@@ -22,6 +23,8 @@ before do
     @current_user = users_table.where(id: session["user_id"]).to_a[0]
 end
 
+### vacations summary section ###
+
 # homepage and list of vacations (aka "index")
 get "/" do
     puts "params: #{params}"
@@ -32,86 +35,59 @@ get "/" do
     view "vacations"
 end
 
-# vacation suggestions (aka "show")
-get "/vacations/:id" do
+### Locations detail section ###
+
+# location details (aka "show")
+get "/location/:id" do
     puts "params: #{params}"
 
+    @location = vacations_table.where(id: params[:id]).to_a[0]
+    pp @location
     @users_table = users_table
-    @vacation = vacations_table.where(id: params[:id]).to_a[0]
-    pp @vacation
 
-    @suggestions = suggestions_table.where(vacation_id: @vacation[:id]).to_a
-    @suggestion = suggestions_table.where(vacation_id: @vacation[:id]).to_a[0]
-    pp @suggestion
+    results = Geocoder.search(@location[:title])
+    lat_long = results.first.coordinates # => [lat, long]
+    @coordinates = lat_long[0], lat_long[1]
 
-    view "vacation"
+    @latitude = lat_long[0]
+    @longitude = lat_long[1]
+
+    @suggestions = suggestions_table.where(vacations_id: @location[:id]).to_a
+    @suggestions_count = suggestions_table.where(vacations_id: @location[:id]).count
+
+    view "location"
+
 end
 
 # display the suggestions form (aka "new")
-get "/vacations/:id/suggestions/new" do
+get "/location/:id/suggestions/new" do
     puts "params: #{params}"
 
-    @vacation = vacations_table.where(id: params[:id]).to_a[0]
+    @location = vacations_table.where(id: params[:id]).to_a[0]
     view "new_suggestion"
 end
 
-# receive the submitted suggestion form (aka "create")
-post "/vacations/:id/suggestions/create" do
+# receive the submitted suggestions form (aka "create")
+post "/location/:id/suggestions/create" do
     puts "params: #{params}"
 
-    # first find the vacation that the suggestion is for
-    @vacation = vacations_table.where(id: params[:id]).to_a[0]
-    # next we want to insert a row in the suggestions table with the suggestion form data
+    # first find the location that you are leaving a comment on
+    @location = vacations_table.where(id: params[:id]).to_a[0]
+
+    # next we want to insert a row in the suggestions table with the suggestions form data
     suggestions_table.insert(
-        vacation_id: @vacation[:id],
+        vacations_id: @location[:id],
         user_id: session["user_id"],
-        comments: params["comments"]
+        comments: params["comments"],
+        name: @current_user[:name],
+        year: @current_user[:year],
+        email: @current_user[:email]
     )
 
-    redirect "/vacations/#{@vacation[:id]}"
+    redirect "/location/#{@location[:id]}"
 end
 
-# display the suggestion form (aka "edit")
-get "/suggestions/:id/edit" do
-    puts "params: #{params}"
-
-    @suggestion = sugugestions_table.where(id: params["id"]).to_a[0]
-    @vacation = vacations_table.where(id: @vacation[:vacation_id]).to_a[0]
-    view "edit_suggestion"
-end
-
-# receive the submitted suggestion form (aka "update")
-post "/suggestions/:id/update" do
-    puts "params: #{params}"
-
-    # find the suggestion to update
-    @suggestioen = suggestions_table.where(id: params["id"]).to_a[0]
-    # find the suggestion's vacation
-    @vacation = vacations_table.where(id: @suggestion[:vacation_id]).to_a[0]
-
-    if @current_user && @current_user[:id] == @suggestion[:id]
-        suggestions.where(id: params["id"]).update(
-            going: params["going"],
-            comments: params["comments"]
-        )
-
-        redirect "/vacations/#{@vacation[:id]}"
-    else
-        view "error"
-    end
-end
-
-# delete the suggestion (aka "destroy")
-get "/suggestions/:id/destroy" do
-    puts "params: #{params}"
-
-    suggestion = suggestions_table.where(id: params["id"]).to_a[0]
-    @vacation = vacations_table.where(id: suggestion[:vacation_id]).to_a[0]
-
-    suggestions_table.where(id: params["id"]).delete
-
-    redirect "/vacations/#{@vacation[:id]}"
-end
+### Users logic section ###
 
 # display the signup form (aka "new")
 get "/users/new" do
@@ -130,6 +106,7 @@ post "/users/create" do
         users_table.insert(
             name: params["name"],
             email: params["email"],
+            year: params["year"],
             password: BCrypt::Password.create(params["password"])
         )
 
@@ -167,5 +144,6 @@ end
 get "/logout" do
     # remove encrypted cookie for logged out user
     session["user_id"] = nil
-    redirect "/logins/new"
+    # redirect "/logins/new"
+    view "logout"
 end

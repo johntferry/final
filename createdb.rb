@@ -14,12 +14,12 @@ DB.create_table! :vacations do
 end
 DB.create_table! :suggestions do
   primary_key :id
-  foreign_key :vacation_id
+  foreign_key :vacations_id
+  foreign_key :user_id
+  String :comments, text: true
   String :name
   String :email
-  String :suggestion, text: true
 end
-
 DB.create_table! :users do
   primary_key :id
   String :name
@@ -29,13 +29,34 @@ end
 
 # Insert initial (seed) data
 vacations_table = DB.from(:vacations)
+suggestions_table = DB.from(:suggestions)
 
-vacations_table.insert(title: "Tahiti Teahupo'o Surfing", 
-                    description: "I will be going to Tahiti to surf one of the biggest waves of the world, Teahupo'o. Wish me luck.",
+vacations_table.insert(title: "Surfing Teahupo'o in Tahiti", 
+                    description: "Surfing this absolutle monster wave -- what do you think I should do in Tahiti if I survive?",
                     date: "October 7, 2020",
                     location: "Tahiti")
 
 vacations_table.insert(title: "Beijing Jiaozi Tour", 
-                    description: "I'm so excited to go to the old hutongs in Beijing for a jiaozi tour. What else should I do?",
-                    date: "February 10, 2021",
-                    location: "Beijing, China")
+                    description: "Exploring the hutongs in Beijing and eating an insane amount of dumplings.",
+                    date: "February 20, 2020",
+                    location: "Beijing")
+
+suggestions_table.insert(vacations_id: 1,
+                    user_id: 0,
+                    comments: "Make sure you visit Bora Bora and Moorea while you're there!",
+                    name: "John Ferry",
+                    email: "john@johntferry.com")
+
+suggestions_table.insert(vacations_id: 1,
+                    user_id: 1,
+                    comments: "I highly doubt you survive surfing that wave. Cancel the trip.",
+                    name: "Alex Ferry",
+                    email: "alex@johntferry.com")
+
+suggestions_table.insert(vacations_id: 2,
+                    user_id: 3,
+                    comments: "Baijiu is a great drink to include, but beware it tastes a bit like jet fuel and operates similarly.",
+                    name: "Tim Ferry",
+                    email: "tim@johntferry.com")
+
+puts "Success!"

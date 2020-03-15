@@ -1,0 +1,13 @@
+<h2>
+    <i class="fas fa-map-marker-alt"></i>
+    <%= @vacation[:title] %>
+</h2>
+<h2>Leave suggestion for <%= @vacation[:title] %></h2>
+
+<form action="/vacation/<%= @vacation[:id] %>/suggestions/create" method="post">
+    <div class="form-group">
+        <label>Provide suggestions for the vacationer!</label>
+        <textarea class="form-control" rows="5" name="comments"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

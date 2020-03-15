@@ -17,7 +17,14 @@ DB.create_table! :suggestions do
   foreign_key :vacation_id
   String :name
   String :email
-  String :suggestions, text: true
+  String :suggestion, text: true
+end
+
+DB.create_table! :users do
+  primary_key :id
+  String :name
+  String :email
+  String :password
 end
 
 # Insert initial (seed) data
